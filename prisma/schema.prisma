@@ -1,0 +1,121 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Event {
+  id              String               @id @default(uuid()) @db.Uuid
+  name            String
+  description     String
+  coverImage      String?
+  startDate       DateTime
+  endDate         DateTime
+
+  days            Day[]
+  venueSections   VenueSection[]
+  musicalArtists  MusicalArtistOnEvent[]
+
+  @@map("events")
+}
+
+model Day {
+  id              String   @id @default(uuid()) @db.Uuid
+  eventId         String   @db.Uuid @map("eventid")
+  description     String
+  date            DateTime
+
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("days")
+}
+
+model VenueSection {
+  id          String        @id @default(uuid()) @db.Uuid
+  eventId     String        @db.Uuid @map("eventid")
+  name        String
+  capacity    Int
+
+  event       Event         @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ticketTypes TicketType[]
+
+  @@map("venue_sections")
+}
+
+model TicketType {
+  id               String        @id @default(uuid()) @db.Uuid
+  sectionId        String        @db.Uuid @map("sectionid")
+  name             String
+  price            Decimal
+  totalQuantity    Int           @map("total_quantity")
+
+  section          VenueSection  @relation(fields: [sectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tickets          Ticket[]
+
+  @@map("ticket_types")
+}
+
+model Ticket {
+  id             String       @id @default(uuid()) @db.Uuid
+  orderId        String       @db.Uuid @map("orderid")
+  ticketTypeId   String       @db.Uuid @map("ticket_typeid")
+  code           String       @unique
+
+  ticketType     TicketType   @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order          Order        @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("tickets")
+}
+
+model Order {
+  id           String     @id @default(uuid()) @db.Uuid
+  userId       String     @db.Uuid
+  totalAmount  Decimal    @map("total_amount")
+  status       String
+  createdAt    DateTime   @default(now())
+
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tickets      Ticket[]
+
+  @@map("orders")
+}
+
+model User {
+  id       String     @id @default(uuid()) @db.Uuid
+  name     String
+  email    String     @unique
+  password String
+  role     UserRole   @default(CUSTOMER)
+  
+  orders   Order[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+model MusicalArtist {
+  id     String   @id @default(uuid()) @db.Uuid
+  name   String
+
+  MusicalArtistOnEvent MusicalArtistOnEvent[]
+
+  @@map("musical_artists")
+}
+
+model MusicalArtistOnEvent {
+  id               String         @id @default(uuid()) @db.Uuid
+  eventId          String         @db.Uuid @map("eventid")
+  musicalArtistId  String         @db.Uuid @map("musical_artist_id")
+
+  event            Event          @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  musicalArtist    MusicalArtist  @relation(fields: [musicalArtistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("musical_artists_on_events")
+}

@@ -1,0 +1,29 @@
+# ⚙️ Node & PNPM
+node_modules/
+.pnpm-debug.log*
+.pnpm-store/
+.env
+.env.local
+
+# 📦 Build & Output
+dist/
+build/
+*.tsbuildinfo
+
+# 🔄 Prisma
+prisma/migrations/
+prisma/dev.db
+prisma/dev.db-journal
+
+# 🧪 Logs
+*.log
+logs/
+*.sqlite-journal
+
+# 🧠 IDEs
+.vscode/
+.idea/
+*.swp
+
+# 📦 Dependencies (lock & cache)
+pnpm-lock.yaml
