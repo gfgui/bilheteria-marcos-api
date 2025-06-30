@@ -4,7 +4,15 @@ import { CreateEventInput, UpdateEventInput, EventResponse, EventListResponse } 
 
 export class EventService {
   async create(data: z.infer<typeof CreateEventInput>): Promise<z.infer<typeof EventResponse>> {
-    const { name, description, coverImage, startDate, endDate } = data
+    const {
+      name,
+      description,
+      coverImage,
+      startDate,
+      endDate,
+      days,
+      venueSections
+    } = data
 
     const event = await prisma.event.create({
       data: {
@@ -12,7 +20,26 @@ export class EventService {
         description,
         coverImage,
         startDate: new Date(startDate),
-        endDate: new Date(endDate)
+        endDate: new Date(endDate),
+        days: {
+          create: days.map(day => ({
+            description: day.description,
+            date: new Date(day.date)
+          }))
+        },
+        venueSections: {
+          create: venueSections.map(section => ({
+            name: section.name,
+            capacity: section.capacity,
+            ticketTypes: {
+              create: section.ticketTypes.map(ticket => ({
+                name: ticket.name,
+                price: ticket.price,
+                totalQuantity: ticket.totalQuantity
+              }))
+            }
+          }))
+        }
       }
     })
 

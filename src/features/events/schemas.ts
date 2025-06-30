@@ -2,13 +2,35 @@ import { z } from 'zod'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 
 // Zod Schemas
+
+const TicketTypeInput = z.object({
+  name: z.string(),
+  price: z.number(),
+  totalQuantity: z.number()
+})
+
+const VenueSectionInput = z.object({
+  name: z.string(),
+  capacity: z.number(),
+  ticketTypes: z.array(TicketTypeInput)
+})
+
+const DayInput = z.object({
+  description: z.string(),
+  date: z.string().datetime()
+})
+
+
 export const CreateEventInput = z.object({
   name: z.string().min(2),
   description: z.string(),
   coverImage: z.string().url().optional(),
   startDate: z.string().datetime(),
-  endDate: z.string().datetime()
+  endDate: z.string().datetime(),
+  days: z.array(DayInput),
+  venueSections: z.array(VenueSectionInput)
 })
+
 
 export const UpdateEventInput = z.object({
   name: z.string().min(2),

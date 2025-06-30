@@ -4,7 +4,7 @@ import { CreateEventInput, UpdateEventInput } from './schemas'
 import { z } from 'zod'
 
 export class EventController {
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService) { }
 
   create = async (
     req: FastifyRequest<{ Body: z.infer<typeof CreateEventInput> }>,
@@ -12,12 +12,14 @@ export class EventController {
   ) => {
     try {
       const event = await this.eventService.create(req.body)
+
       reply.code(201).send(event)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erro desconhecido'
       reply.code(400).send({ message })
     }
   }
+
 
   update = async (
     req: FastifyRequest<{ Params: { id: string }, Body: z.infer<typeof UpdateEventInput> }>,

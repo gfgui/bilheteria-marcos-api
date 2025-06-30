@@ -10,7 +10,7 @@ export async function eventRoutes(fastify: FastifyInstance) {
 
   fastify.post('/', {
     schema: createEventSchema,
-    preHandler: roleGuard(['ADMIN']),
+    //preHandler: roleGuard(['ADMIN']),
     handler: eventController.create
   })
 
