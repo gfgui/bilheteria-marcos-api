@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import { UserController } from './controllers'
 import { UserService } from './services'
-import { createUserSchema, updateUserSchema, getUserSchema, listUsersSchema } from './schemas'
+import { createUserSchema, updateUserSchema, getUserSchema, listUsersSchema, deleteUserSchema } from './schemas'
 import { roleGuard } from '../../utils/role-guard'
 
 export async function userRoutes(fastify: FastifyInstance) {
@@ -28,7 +28,13 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   fastify.get('/', {
     schema: listUsersSchema,
-    //preHandler: roleGuard(['ADMIN']),
+    preHandler: roleGuard(['ADMIN']),
     handler: userController.list
+  })
+
+  fastify.delete('/:id', {
+    schema: deleteUserSchema,
+    preHandler: roleGuard(['ADMIN']),
+    handler: userController.delete
   })
 }

@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt'
 const SALT_ROUNDS = 10
 
 export class UserService {
-    
+
   async create(data: z.infer<typeof CreateUserInput>): Promise<z.infer<typeof UserResponse>> {
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email }
@@ -50,6 +50,12 @@ export class UserService {
   async list(): Promise<z.infer<typeof UserListResponse>> {
     const users = await prisma.user.findMany()
     return users.map(this.mapUser)
+  }
+
+  async delete(id: string): Promise<void> {
+    await prisma.user.delete({
+      where: { id }
+    })
   }
 
   private mapUser(user: { id: string; name: string; email: string; role: string }): z.infer<typeof UserResponse> {

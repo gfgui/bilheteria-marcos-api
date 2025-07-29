@@ -24,13 +24,15 @@ export class AuthService {
         throw new Error('Email already exists')
     }
 
+    const role = data.role ?? 'CUSTOMER' as const;
+
     
     const user = await prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        role: data.role
+        role
       }
     })
 
@@ -42,7 +44,7 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role
       }
     }
   }

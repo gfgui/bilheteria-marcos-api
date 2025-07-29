@@ -54,3 +54,15 @@ export const listUsersSchema = {
     200: zodToJsonSchema(UserListResponse)
   }
 }
+
+export const deleteUserSchema = {
+  tags: ['Users'],
+  response: {
+    204: {
+      description: 'Usuário deletado com sucesso'
+    },
+    400: {
+      description: 'Erro ao deletar usuário'
+    }
+  }
+}

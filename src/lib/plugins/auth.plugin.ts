@@ -3,7 +3,6 @@ import fastifyJwt from '@fastify/jwt'
 
 declare module 'fastify' {
   interface FastifyRequest {
-    cookies: Record<string, string>;
     railander: {
       userId: string
       role: string
@@ -18,24 +17,33 @@ const authPlugin = fp(async (fastify) => {
   })
 
   fastify.addHook('onRequest', async (request, reply) => {
-    const publicPaths = ['/api/auth/login', '/api/auth/register', '/docs', '/api/users', '/api/events']
-    const url = request.raw.url || ''
+    const publicPaths = [
+      '/api/auth/login',
+      '/api/auth/register',
+      '/docs',
+      '/api/events/list',
+      '/api/events/get'
+    ]
 
-    const isPublic = publicPaths.some(path => url === path || url.startsWith(path + '/'))
+    const url = request.raw.url || ''
+    const isPublic = publicPaths.some(
+      path => url === path || url.startsWith(path + '/'),
+    )
     if (isPublic) return
 
-    const token = request.cookies.token;
+    const token =
+      request.cookies.token ||
+      request.headers.authorization?.replace('Bearer ', '')
 
     if (!token) {
-      reply.code(401).send({ message: "Unauthorized" });
-      return;
+      return reply.code(401).send({ message: 'Token não encontrado' })
     }
 
     try {
-      await request.jwtVerify()
-
+      const decoded = fastify.jwt.verify<{ sub: string; role: string }>(token)
+      request.user = decoded
     } catch (err) {
-      reply.code(401).send({ message: 'Unauthorized' })
+      return reply.code(401).send({ message: 'Token inválido' })
     }
   })
 })

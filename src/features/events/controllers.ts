@@ -55,4 +55,17 @@ export class EventController {
       reply.code(500).send({ message: 'Erro desconhecido' })
     }
   }
+
+  delete = async (
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) => {
+  try {
+    await this.eventService.delete(req.params.id)
+    reply.code(204).send()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro desconhecido'
+    reply.code(400).send({ message })
+  }
+}
 }

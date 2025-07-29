@@ -117,5 +117,6 @@ model MusicalArtistOnEvent {
   event            Event          @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   musicalArtist    MusicalArtist  @relation(fields: [musicalArtistId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
+  @@unique([eventId, musicalArtistId]) 
   @@map("musical_artists_on_events")
 }
